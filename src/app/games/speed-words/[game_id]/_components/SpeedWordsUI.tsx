@@ -176,17 +176,18 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 							autoDirect={autoDirect}
 						/>
 					</div>
-					<Keyboard
-						letters={keyboardLetters}
-						onKeyPress={handleKeyPress}
-						sendPeel={sendPeel}
-						color={color}
-						handleBackSpace={sendBackSpace}
-						isDump={isDump}
-						setIsDump={() => setIsDump(!isDump)}
-						lettersLeft={lettersLeft}
-						isActive={isActive}
-					/>
+					{isActive && (
+						<Keyboard
+							letters={keyboardLetters}
+							onKeyPress={handleKeyPress}
+							sendPeel={sendPeel}
+							color={color}
+							handleBackSpace={sendBackSpace}
+							isDump={isDump}
+							setIsDump={() => setIsDump(!isDump)}
+							lettersLeft={lettersLeft}
+						/>
+					)}
 				</>
 			)}
 		</div>
