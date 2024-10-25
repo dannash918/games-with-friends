@@ -44,7 +44,9 @@ export const Keyboard = ({
 						</div>
 					</div>
 					<div onClick={() => setIsDump()}>
-						<div className="mx-3 my-2 rounded-md bg-blue-500 p-3">
+						<div
+							className={`mx-3 my-2 rounded-md ${isDump ? "bg-blue-700" : "bg-blue-500"} p-3`}
+						>
 							<div className="text-sm font-medium">DUMP</div>
 						</div>
 					</div>

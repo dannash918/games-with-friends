@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
@@ -12,17 +13,17 @@ import { Button } from "@/components/ui/button";
 export default function Lobby({
 	socket,
 	players,
-	winner = undefined,
 }: {
 	players: any[];
 	socket: PartySocket;
-	winner: string | undefined;
 }) {
 	const sendStartGame = () => {
 		socket.send(JSON.stringify({ message: "startGame" }));
 	};
 
-	console.log("Players: " + JSON.stringify(players));
+	players.sort((a, b) => b.score - a.score);
+	const winner = players.find((player) => player.score > -1);
+	console.log("Winner is: " + winner);
 
 	return (
 		<>
@@ -35,16 +36,19 @@ export default function Lobby({
 				</div>
 
 				{winner && (
-					<div className="row my-5 flex items-center justify-center">
-						WINNER OF ROUND IS: {winner}!!
+					<div className="row m-2 flex items-center justify-center">
+						Congratulations {winner.name}!
 					</div>
 				)}
-				<div className="row flex items-center justify-center">
-					<div>Players</div>
+
+				<div className="row mb-2 mt-3 flex items-center justify-center">
+					{winner && <div>Scores</div>}
+					{!winner && <div>Players</div>}
 				</div>
 				{players.map((player: any, idx: number) => (
 					<div className={`row flex items-center justify-center `} key={idx}>
 						<div className={getTextColor(player.color)}>{player.name}</div>
+						{player.score > -1 && <div>: {player.score}</div>}
 					</div>
 				))}
 			</div>

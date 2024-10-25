@@ -275,7 +275,7 @@ export const initLetterGrid = (letter: string) => {
 		12: {},
 		13: {},
 		14: {},
-		15: { 15: { letter: letter, color: "green" } },
+		15: { 15: { letter: letter, color: "teal" } },
 		16: {},
 		17: {},
 		18: {},

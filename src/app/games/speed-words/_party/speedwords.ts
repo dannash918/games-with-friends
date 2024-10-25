@@ -4,6 +4,7 @@
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 import type * as Party from "partykit/server";
 
 import {
@@ -15,8 +16,9 @@ import {
 
 export interface Player {
 	color: string;
-	connection: Party.Connection;
+	connectionId: string;
 	name: string;
+	score: number;
 }
 
 export default class SpeedWordsServer implements Party.Server {
@@ -79,9 +81,10 @@ export default class SpeedWordsServer implements Party.Server {
 		const queryParams = this.extractQueryParams(ctx.request.url);
 		console.log("Got to onConnect: " + queryParams.name || "Fred");
 		this.players.push({
-			connection: connection,
+			connectionId: connection.id,
 			name: queryParams.name || `Player ${this.players.length + 1}`,
 			color: getColor(this.colors),
+			score: -1,
 		});
 		const simpPlayers = this.players.map((player) => ({
 			name: player.name,
@@ -124,7 +127,7 @@ export default class SpeedWordsServer implements Party.Server {
 		// Handle the disconnection event
 		console.log("Client disconnected:", connection.id);
 		this.players = this.players.filter(
-			(player) => player.connection.id !== connection.id,
+			(player) => player.connectionId !== connection.id,
 		);
 
 		const simpPlayers = this.players.map((player) => ({
@@ -169,7 +172,12 @@ export default class SpeedWordsServer implements Party.Server {
 					color: player.color,
 				},
 			};
-			player.connection.send(JSON.stringify(response));
+			const connections = Array.from(this.room.getConnections());
+			const connection = connections.find(
+				(connection) => connection.id === player.connectionId,
+			);
+
+			connection && connection.send(JSON.stringify(response));
 		}
 		this.broadcastLettersLeft();
 	}
@@ -205,7 +213,12 @@ export default class SpeedWordsServer implements Party.Server {
 				};
 				console.log("Sending letter back: " + letterFromGrid + color);
 				if (player.color == color) {
-					player.connection.send(JSON.stringify(response));
+					const connections = Array.from(this.room.getConnections());
+					const connection = connections.find(
+						(connection) => connection.id === player.connectionId,
+					);
+
+					connection && connection.send(JSON.stringify(response));
 				}
 			}
 		}
@@ -244,25 +257,57 @@ export default class SpeedWordsServer implements Party.Server {
 		console.log("Got to dump!");
 		const dumpedLetter = data.letter;
 		this.letterPool.push(dumpedLetter);
-		const connection = this.players.find(
+		const connectionId = this.players.find(
 			(player) => player.color == data.color,
-		)?.connection;
-		if (!connection) {
+		)?.connectionId;
+		if (!connectionId) {
 			return;
 		}
+		const connections = Array.from(this.room.getConnections());
+		const connection = connections.find(
+			(connection) => connection.id === connectionId,
+		);
+
 		const newLetters = getLetters(3, this.letterPool);
 		const response = { message: "peel", data: { letters: newLetters } };
-		connection.send(JSON.stringify(response));
+		connection && connection.send(JSON.stringify(response));
 		this.broadcastLettersLeft();
 	}
 
 	finish(data: any) {
 		console.log("Got to finish!");
-		const player = this.players.find((player) => player.color == data.color);
-		if (!player) {
-			return;
-		}
-		const response = { message: "finish", data: { winner: player.name } };
+
+		const colorCounts: any = {};
+
+		Object.values(this.letterGrid).forEach((row) => {
+			const rowObject = row as { [key: string]: any };
+			Object.values(rowObject).forEach((cell) => {
+				if (cell.color) {
+					const color = cell.color;
+					if (colorCounts[color]) {
+						colorCounts[color]++;
+					} else {
+						colorCounts[color] = 1;
+					}
+				}
+			});
+		});
+
+		console.log("Colors is: " + JSON.stringify(colorCounts));
+		this.players.forEach((player) => {
+			const matchingColor = Object.keys(colorCounts).find(
+				(color) => color === player.color,
+			);
+			player.score = 0;
+			if (matchingColor) {
+				player.score = colorCounts[matchingColor];
+				if (player.color == data.color) {
+					player.score += 10;
+				}
+			}
+		});
+		console.log("Players: " + JSON.stringify(this.players));
+		const response = { message: "finish", data: { players: this.players } };
 		this.room.broadcast(JSON.stringify(response));
 	}
 

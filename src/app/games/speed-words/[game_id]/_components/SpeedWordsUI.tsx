@@ -28,7 +28,7 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 	const [players, setPlayers] = useState<any[]>([]);
 	const name = localStorage.getItem("userName");
 	const [isDump, setIsDump] = useState<boolean>(false);
-	const [winner, setWinner] = useState<string | undefined>();
+	// const [winner, setWinner] = useState<string | undefined>();
 
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,
@@ -70,7 +70,7 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 		}
 		if (mess.message === "finish") {
 			setKeyBoardLetters([]);
-			setWinner(mess.data.winner);
+			setPlayers(mess.data.players);
 			setGameRunning(false);
 		}
 		if (mess.message === "playerList") {
@@ -164,9 +164,7 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 
 	return (
 		<div>
-			{!gameRunning && (
-				<Lobby winner={winner} socket={socket} players={players} />
-			)}
+			{!gameRunning && <Lobby socket={socket} players={players} />}
 			{gameRunning && (
 				<>
 					<div ref={divRef} className="h-[400px] overflow-scroll">
