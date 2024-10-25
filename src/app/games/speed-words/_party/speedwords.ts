@@ -112,6 +112,9 @@ export default class SpeedWordsServer implements Party.Server {
 		if (message === "backspace") {
 			this.backspace(requestJson.data);
 		}
+		if (message === "dump") {
+			this.dump(requestJson.data);
+		}
 	}
 
 	async onClose(connection: Party.Connection) {
@@ -153,12 +156,7 @@ export default class SpeedWordsServer implements Party.Server {
 		this.letterPool = initLetterPool();
 		const initLetter = getLetters(1, this.letterPool);
 		this.letterGrid = initLetterGrid(initLetter[0]);
-		// const connections: Iterable<Party.Connection<unknown>> =
-		// 	this.room.getConnections();
-		// const connectionsArray = Array.from(connections);
 		for (const player of this.players) {
-			// const color = getColor(this.colors);
-
 			const newLetters = getLetters(7, this.letterPool);
 			const response = {
 				message: "startGame",
@@ -236,6 +234,22 @@ export default class SpeedWordsServer implements Party.Server {
 			const response = { message: "peel", data: { letters: newLetters } };
 			connection.send(JSON.stringify(response));
 		}
+		this.broadcastLettersLeft();
+	}
+
+	dump(data: any) {
+		console.log("Got to dump!");
+		const dumpedLetter = data.letter;
+		this.letterPool.push(dumpedLetter);
+		const connection = this.players.find(
+			(player) => player.color == data.color,
+		)?.connection;
+		if (!connection) {
+			return;
+		}
+		const newLetters = getLetters(3, this.letterPool);
+		const response = { message: "peel", data: { letters: newLetters } };
+		connection.send(JSON.stringify(response));
 		this.broadcastLettersLeft();
 	}
 

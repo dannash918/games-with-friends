@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -18,8 +16,6 @@ import SpeedWordsBoard from "./SpeedWordsBoard";
 import { Keyboard } from "./SpeedWordsKeyboard";
 
 export default function SpeedWordsUI({ gameId }: { gameId: string }) {
-	const room = gameId;
-	const initialized = useRef(false); // as Strict Mode is on useEffect gets called twice on init
 	const divRef = useRef<HTMLDivElement>(null);
 
 	const [selectedCell, setSelectedCell] = useState([15, 15]);
@@ -31,6 +27,7 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 	const [color, setColor] = useState<string>();
 	const [players, setPlayers] = useState<any[]>([]);
 	const name = localStorage.getItem("userName");
+	const [isDump, setIsDump] = useState<boolean>(false);
 
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,
@@ -68,11 +65,18 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 			setLetterGrid(mess.data.letterGrid);
 		}
 		if (mess.message === "playerList") {
-			// console.log("Got to joined");
 			const newPlayers = mess.data.players;
 			console.log("New Players: " + JSON.stringify(newPlayers));
 			setPlayers(newPlayers);
 		}
+	};
+
+	const handleCellPress = (cell: any) => {
+		if (cell[0] == selectedCell[0] && cell[1] == selectedCell[1]) {
+			setAutoDirect(autoDirect === "→" ? "↓" : "→");
+			return;
+		}
+		setSelectedCell(cell);
 	};
 
 	const handlePeel = (letters: any) => {
@@ -118,11 +122,24 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 	};
 
 	const handleKeyPress = (letter: string, idx: number) => {
+		console.log("Dump after is: " + isDump);
+		if (isDump) {
+			sendDump(letter, idx);
+			setIsDump(false);
+			return;
+		}
 		console.log("Letter is: " + letter);
 		sendLetter(letter);
 		keyboardLetters.splice(idx, 1);
 		setKeyBoardLetters(keyboardLetters);
 		autoMove(selectedCell, autoDirect, false);
+	};
+
+	const sendDump = (letter: string, idx: number) => {
+		const data = { letter: letter, color: color };
+		socket.send(JSON.stringify({ message: "dump", data: data }));
+		keyboardLetters.splice(idx, 1);
+		setKeyBoardLetters(keyboardLetters);
 	};
 
 	return (
@@ -134,21 +151,20 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 						<SpeedWordsBoard
 							letterGrid={letterGrid}
 							selectedCell={selectedCell}
-							setSelectedCell={setSelectedCell}
+							handleCellPress={handleCellPress}
+							autoDirect={autoDirect}
 						/>
 					</div>
 					<Keyboard
 						letters={keyboardLetters}
 						onKeyPress={handleKeyPress}
-						autoDirect={autoDirect}
-						setAutoDirect={setAutoDirect}
 						sendPeel={sendPeel}
 						color={color}
 						handleBackSpace={sendBackSpace}
+						isDump={isDump}
+						setIsDump={() => setIsDump(!isDump)}
+						lettersLeft={lettersLeft}
 					/>
-					<div className="absolute bottom-0 left-1/2 -translate-x-1/2 transform">
-						Letters Left: {lettersLeft}
-					</div>
 				</>
 			)}
 		</div>

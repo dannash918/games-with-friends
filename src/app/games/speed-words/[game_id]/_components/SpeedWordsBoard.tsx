@@ -22,10 +22,10 @@ export const getCellLetter = (
 	return "";
 };
 
-const Cell = (props: { isSelected: any; letter: any }) => {
+const Cell = (props: { isSelected: any; letter: any; isShaded: boolean }) => {
 	return (
 		<div
-			className={`border-1 flex h-8 w-8 items-center justify-center border 
+			className={`border-1 flex h-8 w-8 items-center justify-center border ${props.isShaded ? "bg-gray-300" : ""} 
 			${props.isSelected ? "border-2 border-red-300" : "border-grey-300"}`}
 		>
 			{props.letter != "" && (
@@ -39,28 +39,32 @@ const Cell = (props: { isSelected: any; letter: any }) => {
 	);
 };
 const Row = (props: {
-	setSelectedCell: any;
+	handleCellPress: any;
 	letterGrid: any;
 	rowNum: any;
 	selectedCell: any;
+	autoDirect: string;
 }) => {
 	const cells = [];
 	for (let colNum = 0; colNum < 30; colNum++) {
-		let isSelected = false;
-		if (
-			props.selectedCell[0] == props.rowNum &&
-			props.selectedCell[1] == colNum
-		) {
-			isSelected = true;
-		}
+		const isSelected =
+			props.selectedCell[0] == props.rowNum && props.selectedCell[1] == colNum;
+		const isShaded =
+			(props.selectedCell[0] == props.rowNum &&
+				props.autoDirect == "→" &&
+				props.selectedCell[1] < colNum) ||
+			(props.selectedCell[1] == colNum &&
+				props.autoDirect == "↓" &&
+				props.selectedCell[0] < props.rowNum);
 		cells.push(
 			<div
 				key={colNum}
-				onClick={() => props.setSelectedCell([props.rowNum, colNum])}
+				onClick={() => props.handleCellPress([props.rowNum, colNum])}
 			>
 				<Cell
 					letter={getCellLetter(props.rowNum, colNum, props.letterGrid)}
 					isSelected={isSelected}
+					isShaded={isShaded}
 				/>
 			</div>,
 		);
@@ -70,7 +74,8 @@ const Row = (props: {
 export const getRows = (
 	letterGrid: any,
 	selectedCell: any,
-	setSelectedCell: any,
+	handleCellPress: any,
+	autoDirect: string,
 ) => {
 	const rows = [];
 	for (let i = 0; i < 30; i++) {
@@ -80,7 +85,8 @@ export const getRows = (
 				letterGrid={letterGrid}
 				rowNum={i}
 				selectedCell={selectedCell}
-				setSelectedCell={setSelectedCell}
+				handleCellPress={handleCellPress}
+				autoDirect={autoDirect}
 			/>,
 		);
 	}
@@ -90,15 +96,17 @@ export const getRows = (
 export default function SpeedWordsBoard({
 	letterGrid,
 	selectedCell,
-	setSelectedCell,
+	handleCellPress,
+	autoDirect,
 }: {
-	setSelectedCell: any;
+	handleCellPress: any;
 	letterGrid: any;
 	selectedCell: any;
+	autoDirect: string;
 }) {
 	return (
 		<div className="mt-30 mb-100 ml-0">
-			{getRows(letterGrid, selectedCell, setSelectedCell)}
+			{getRows(letterGrid, selectedCell, handleCellPress, autoDirect)}
 		</div>
 	);
 }

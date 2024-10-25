@@ -10,11 +10,12 @@ import { getBgColor } from "@/app/functions/color-functions";
 export const Keyboard = ({
 	letters,
 	onKeyPress,
-	autoDirect,
-	setAutoDirect,
 	sendPeel,
+	setIsDump,
 	color,
 	handleBackSpace,
+	lettersLeft,
+	isDump,
 }: any) => {
 	const kl = [...letters];
 	const keyRows = [];
@@ -23,10 +24,6 @@ export const Keyboard = ({
 		keyRows.push(row);
 	}
 	keyRows.push(kl);
-
-	const handleDirectionPress = () => {
-		setAutoDirect(autoDirect === "→" ? "↓" : "→");
-	};
 
 	return (
 		<div className="absolute bottom-0 left-1/2 -translate-x-1/2 transform">
@@ -37,36 +34,41 @@ export const Keyboard = ({
 						rowLetters={kr}
 						onKeyPress={onKeyPress}
 						color={color}
+						isDump={isDump}
 					/>
 				))}
-				<div className="mb-10 flex items-center justify-center">
-					<div>Direction: </div>
-					<div onClick={() => handleDirectionPress()}>
-						<div className="my-2 ml-1 mr-5 rounded-md bg-blue-500 p-3">
-							<div className="text-sm font-medium"> {autoDirect} </div>
-						</div>
-					</div>
+				<div className="mb-4 flex items-center justify-center">
 					<div onClick={() => handleBackSpace()}>
-						<div className="mx-5 my-2 rounded-md bg-blue-500 p-3">
+						<div className="mx-3 my-2 rounded-md bg-blue-500 p-3">
 							<div className="text-sm font-medium">⌫</div>
 						</div>
 					</div>
 					<div onClick={() => sendPeel()}>
-						<div className="mx-5 my-2 rounded-md bg-blue-500 p-3">
+						<div className="mx-3 my-2 rounded-md bg-blue-500 p-3">
 							<div className="text-sm font-medium">PEEL</div>
 						</div>
 					</div>
+					<div onClick={() => setIsDump()}>
+						<div className="mx-3 my-2 rounded-md bg-blue-500 p-3">
+							<div className="text-sm font-medium">DUMP</div>
+						</div>
+					</div>
+				</div>
+				<div className="flex items-center justify-evenly">
+					<div>Letters Left: {lettersLeft}</div>
 				</div>
 			</div>
 		</div>
 	);
 };
 
-const KeyboardRow = ({ onKeyPress, rowLetters, color }: any) => (
+const KeyboardRow = ({ onKeyPress, rowLetters, color, isDump }: any) => (
 	<div className="mb-2 flex justify-center">
 		{rowLetters.map((letter: any, idx: any) => (
 			<div key={idx} onClick={() => onKeyPress(letter, idx)}>
-				<div className={`m-0.5 rounded-md ${getBgColor(color)} p-3`}>
+				<div
+					className={`m-0.5 rounded-md ${getBgColor(color, isDump)} hover:${getBgColor(color)} p-3`}
+				>
 					<div className="px-1 text-sm font-medium">{letter}</div>
 				</div>
 			</div>

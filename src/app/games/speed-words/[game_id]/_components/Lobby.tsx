@@ -40,16 +40,6 @@ export default function Lobby({
 					</div>
 				))}
 			</div>
-			{/* <div className="flex-direction: row flex items-center justify-center">
-				<div>Welcome to Speed Words</div>
-				<div>Players</div>
-				{players.map((player: any, idx: number) => (
-					<div className={getTextColor(player.color)} key={idx}>
-						{player.name}
-					</div>
-				))}
-			</div> */}
-
 			<div className="mt-6 flex flex-col items-center">
 				<Button
 					className={`transform bg-green-500 px-4 hover:bg-green-500/90`}

@@ -41,45 +41,88 @@ export const getTextColor = (color: string) => {
 	}
 };
 
-export const getBgColor = (color: string) => {
+export const getBgColor = (color: string, _isLight = false) => {
+	if (!_isLight) {
+		switch (color) {
+			case "red":
+				return "bg-red-500";
+			case "blue":
+				return "bg-blue-500";
+			case "green":
+				return "bg-green-500";
+			case "yellow":
+				return "bg-yellow-500";
+			case "purple":
+				return "bg-purple-500";
+			case "pink":
+				return "bg-pink-500";
+			case "orange":
+				return "bg-orange-500";
+			case "teal":
+				return "bg-teal-500";
+			case "cyan":
+				return "bg-cyan-500";
+			case "gray":
+				return "bg-gray-500";
+			case "black":
+				return "bg-black";
+			case "white":
+				return "bg-white";
+			case "amber":
+				return "bg-amber-500";
+			case "lime":
+				return "bg-lime-500";
+			case "rose":
+				return "bg-rose-500";
+			case "indigo":
+				return "bg-indigo-500";
+			case "violet":
+				return "bg-violet-500";
+			case "fuchsia":
+				return "bg-fuchsia-500";
+			default:
+				return `bg-${color}-500`; // default color
+		}
+	}
+
 	switch (color) {
 		case "red":
-			return "bg-red-500";
+			return "bg-red-300";
 		case "blue":
-			return "bg-blue-500";
+			return "bg-blue-300";
 		case "green":
-			return "bg-green-500";
+			return "bg-green-300";
 		case "yellow":
-			return "bg-yellow-500";
+			return "bg-yellow-300";
 		case "purple":
-			return "bg-purple-500";
+			return "bg-purple-300";
 		case "pink":
-			return "bg-pink-500";
+			return "bg-pink-300";
 		case "orange":
-			return "bg-orange-500";
+			return "bg-orange-300";
 		case "teal":
-			return "bg-teal-500";
+			return "bg-teal-300";
 		case "cyan":
-			return "bg-cyan-500";
+			return "bg-cyan-300";
 		case "gray":
-			return "bg-gray-500";
+			return "bg-gray-300";
 		case "black":
 			return "bg-black";
 		case "white":
 			return "bg-white";
 		case "amber":
-			return "bg-amber-500";
+			return "bg-amber-300";
 		case "lime":
-			return "bg-lime-500";
+			return "bg-lime-300";
 		case "rose":
-			return "bg-rose-500";
+			return "bg-rose-300";
 		case "indigo":
-			return "bg-indigo-500";
+			return "bg-indigo-300";
 		case "violet":
-			return "bg-violet-500";
+			return "bg-violet-300";
 		case "fuchsia":
-			return "bg-fuchsia-500";
+			return "bg-fuchsia-300";
 		default:
-			return `bg-${color}-500`; // default color
+			return `bg-${color}-300`; // default color
 	}
 };
