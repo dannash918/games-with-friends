@@ -72,11 +72,15 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 			setPlayers(mess.data.players);
 			setGameRunning(false);
 		}
-		if (mess.message === "joined" || mess.message === "disconnected") {
+		if (mess.message === "joined") {
 			setGameRunning(mess.data.gameInProgress);
 			const newPlayers = mess.data.players;
 			setPlayers(newPlayers);
 			setLetterGrid(mess.data.letterGrid);
+		}
+		if (mess.message == "disconnected") {
+			const newPlayers = mess.data.players;
+			setPlayers(newPlayers);
 		}
 		if (mess.message === "peel") {
 			handlePeel(mess.data.letters);
