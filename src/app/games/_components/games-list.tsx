@@ -9,14 +9,9 @@ import {
 
 const games = [
 	{
-		label: "Tic Tac Toe",
-		description: "Play Tic Tac Toe with friends or against a robot!",
-		href: "/games/tic-tac-toe",
-	},
-	{
-		label: "Extreme Words",
-		description: "Play Extreme Words with a group of friends!",
-		href: "/games/extreme-words",
+		label: "Bananagrams",
+		description: "Play your tiles to make words as fast as you can!",
+		href: "/games/speed-words",
 	},
 	{
 		label: "The Mind",
@@ -25,9 +20,15 @@ const games = [
 		href: "/games/the-mind",
 	},
 	{
-		label: "Speed Words",
-		description: "Play your tiles to make words as fast as you can!",
-		href: "/games/speed-words",
+		label: "Extreme Articulate",
+		description:
+			"Play Articulate with a bunch of additional rules for extra chaos!!",
+		href: "/games/extreme-words",
+	},
+	{
+		label: "Tic Tac Toe",
+		description: "Play Tic Tac Toe with friends or against a robot!",
+		href: "/games/tic-tac-toe",
 	},
 ];
 

@@ -28,7 +28,7 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 	const [players, setPlayers] = useState<any[]>([]);
 	const name = localStorage.getItem("userName");
 	const [isDump, setIsDump] = useState<boolean>(false);
-	const [winner, setWinner] = useState<string | undefined>("232");
+	const [winner, setWinner] = useState<string | undefined>();
 
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,
@@ -56,6 +56,9 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 			setLettersLeft(mess.data.lettersLeft);
 		}
 		if (mess.message === "startGame") {
+			setAutoDirect("→");
+			setKeyBoardLetters([]);
+			setSelectedCell([15, 15]);
 			setLetterGrid(mess.data.letterGrid);
 			console.log("Color is: " + mess.data.color);
 			setColor(mess.data.color);
@@ -66,6 +69,7 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 			setLetterGrid(mess.data.letterGrid);
 		}
 		if (mess.message === "finish") {
+			setKeyBoardLetters([]);
 			setWinner(mess.data.winner);
 			setGameRunning(false);
 		}
