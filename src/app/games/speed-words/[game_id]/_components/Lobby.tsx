@@ -12,9 +12,11 @@ import { Button } from "@/components/ui/button";
 export default function Lobby({
 	socket,
 	players,
+	winner = undefined,
 }: {
 	players: any[];
 	socket: PartySocket;
+	winner: string | undefined;
 }) {
 	const sendStartGame = () => {
 		socket.send(JSON.stringify({ message: "startGame" }));
@@ -31,6 +33,12 @@ export default function Lobby({
 				<div className="row flex items-center justify-center">
 					Room: {socket.room}
 				</div>
+
+				{winner && (
+					<div className="row my-5 flex items-center justify-center">
+						WINNER OF ROUND IS: {winner}!!
+					</div>
+				)}
 				<div className="row flex items-center justify-center">
 					<div>Players</div>
 				</div>
@@ -45,7 +53,9 @@ export default function Lobby({
 					className={`transform bg-green-500 px-4 hover:bg-green-500/90`}
 					onClick={() => sendStartGame()}
 				>
-					<div className="flex items-center">Start Round</div>
+					<div className="flex items-center">
+						{winner != undefined ? "Restart Round" : "Start Round"}
+					</div>
 				</Button>
 			</div>
 		</>

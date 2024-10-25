@@ -28,6 +28,7 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 	const [players, setPlayers] = useState<any[]>([]);
 	const name = localStorage.getItem("userName");
 	const [isDump, setIsDump] = useState<boolean>(false);
+	const [winner, setWinner] = useState<string | undefined>("232");
 
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,
@@ -64,6 +65,10 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 		if (mess.message === "letterGridUpdate") {
 			setLetterGrid(mess.data.letterGrid);
 		}
+		if (mess.message === "finish") {
+			setWinner(mess.data.winner);
+			setGameRunning(false);
+		}
 		if (mess.message === "playerList") {
 			const newPlayers = mess.data.players;
 			console.log("New Players: " + JSON.stringify(newPlayers));
@@ -91,9 +96,20 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 		socket.send(JSON.stringify({ message: "playLetter", data: data }));
 	};
 
-	const sendPeel = () => {
+	const sendPeel = (lettersLength: number) => {
+		if (lettersLength != 0) {
+			return;
+		}
+		if (lettersLeft == 0) {
+			handleWin();
+		}
 		const data = { uniqueId: 123 };
 		socket.send(JSON.stringify({ message: "peel", data: data }));
+	};
+
+	const handleWin = () => {
+		const data = { color: color };
+		socket.send(JSON.stringify({ message: "win", data: data }));
 	};
 
 	const sendBackSpace = () => {
@@ -144,7 +160,9 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 
 	return (
 		<div>
-			{!gameRunning && <Lobby socket={socket} players={players} />}
+			{!gameRunning && (
+				<Lobby winner={winner} socket={socket} players={players} />
+			)}
 			{gameRunning && (
 				<>
 					<div ref={divRef} className="h-[400px] overflow-scroll">

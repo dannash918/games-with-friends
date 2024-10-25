@@ -87,42 +87,42 @@ export const getBgColor = (color: string, _isLight = false) => {
 
 	switch (color) {
 		case "red":
-			return "bg-red-300";
+			return "bg-red-400";
 		case "blue":
-			return "bg-blue-300";
+			return "bg-blue-400";
 		case "green":
-			return "bg-green-300";
+			return "bg-green-400";
 		case "yellow":
-			return "bg-yellow-300";
+			return "bg-yellow-400";
 		case "purple":
-			return "bg-purple-300";
+			return "bg-purple-400";
 		case "pink":
-			return "bg-pink-300";
+			return "bg-pink-400";
 		case "orange":
-			return "bg-orange-300";
+			return "bg-orange-400";
 		case "teal":
-			return "bg-teal-300";
+			return "bg-teal-400";
 		case "cyan":
-			return "bg-cyan-300";
+			return "bg-cyan-400";
 		case "gray":
-			return "bg-gray-300";
+			return "bg-gray-400";
 		case "black":
 			return "bg-black";
 		case "white":
 			return "bg-white";
 		case "amber":
-			return "bg-amber-300";
+			return "bg-amber-400";
 		case "lime":
-			return "bg-lime-300";
+			return "bg-lime-400";
 		case "rose":
-			return "bg-rose-300";
+			return "bg-rose-400";
 		case "indigo":
-			return "bg-indigo-300";
+			return "bg-indigo-400";
 		case "violet":
-			return "bg-violet-300";
+			return "bg-violet-400";
 		case "fuchsia":
-			return "bg-fuchsia-300";
+			return "bg-fuchsia-400";
 		default:
-			return `bg-${color}-300`; // default color
+			return `bg-${color}-400`; // default color
 	}
 };

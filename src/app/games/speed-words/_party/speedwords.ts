@@ -115,6 +115,9 @@ export default class SpeedWordsServer implements Party.Server {
 		if (message === "dump") {
 			this.dump(requestJson.data);
 		}
+		if (message === "win") {
+			this.finish(requestJson.data);
+		}
 	}
 
 	async onClose(connection: Party.Connection) {
@@ -230,7 +233,7 @@ export default class SpeedWordsServer implements Party.Server {
 			this.room.getConnections();
 		const connectionsArray = Array.from(connections);
 		for (const connection of connectionsArray) {
-			const newLetters = getLetters(3, this.letterPool);
+			const newLetters = getLetters(2, this.letterPool);
 			const response = { message: "peel", data: { letters: newLetters } };
 			connection.send(JSON.stringify(response));
 		}
@@ -251,6 +254,16 @@ export default class SpeedWordsServer implements Party.Server {
 		const response = { message: "peel", data: { letters: newLetters } };
 		connection.send(JSON.stringify(response));
 		this.broadcastLettersLeft();
+	}
+
+	finish(data: any) {
+		console.log("Got to finish!");
+		const player = this.players.find((player) => player.color == data.color);
+		if (!player) {
+			return;
+		}
+		const response = { message: "finish", data: { winner: player.name } };
+		this.room.broadcast(JSON.stringify(response));
 	}
 
 	broadcastLettersLeft() {
