@@ -28,7 +28,7 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 	const [players, setPlayers] = useState<any[]>([]);
 	const name = localStorage.getItem("userName");
 	const [isDump, setIsDump] = useState<boolean>(false);
-	// const [winner, setWinner] = useState<string | undefined>();
+	const [isActive, setIsActive] = useState<boolean>(false);
 
 	const socket = usePartySocket({
 		host: PARTYKIT_HOST,
@@ -49,13 +49,11 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 
 	socket.onmessage = (response) => {
 		const mess = JSON.parse(response.data);
-		if (mess.message === "peel") {
-			handlePeel(mess.data.letters);
-		}
 		if (mess.message === "lettersLeft") {
 			setLettersLeft(mess.data.lettersLeft);
 		}
 		if (mess.message === "startGame") {
+			console.log("KB Letters: " + JSON.stringify(keyboardLetters));
 			setAutoDirect("→");
 			setKeyBoardLetters([]);
 			setSelectedCell([15, 15]);
@@ -64,6 +62,7 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 			setColor(mess.data.color);
 			handlePeel(mess.data.letters);
 			setGameRunning(true);
+			setIsActive(true);
 		}
 		if (mess.message === "letterGridUpdate") {
 			setLetterGrid(mess.data.letterGrid);
@@ -73,10 +72,14 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 			setPlayers(mess.data.players);
 			setGameRunning(false);
 		}
-		if (mess.message === "playerList") {
+		if (mess.message === "joined" || mess.message === "disconnected") {
+			setGameRunning(mess.data.gameInProgress);
 			const newPlayers = mess.data.players;
-			console.log("New Players: " + JSON.stringify(newPlayers));
 			setPlayers(newPlayers);
+			setLetterGrid(mess.data.letterGrid);
+		}
+		if (mess.message === "peel") {
+			handlePeel(mess.data.letters);
 		}
 	};
 
@@ -142,13 +145,11 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 	};
 
 	const handleKeyPress = (letter: string, idx: number) => {
-		console.log("Dump after is: " + isDump);
 		if (isDump) {
 			sendDump(letter, idx);
 			setIsDump(false);
 			return;
 		}
-		console.log("Letter is: " + letter);
 		sendLetter(letter);
 		keyboardLetters.splice(idx, 1);
 		setKeyBoardLetters(keyboardLetters);
@@ -184,6 +185,7 @@ export default function SpeedWordsUI({ gameId }: { gameId: string }) {
 						isDump={isDump}
 						setIsDump={() => setIsDump(!isDump)}
 						lettersLeft={lettersLeft}
+						isActive={isActive}
 					/>
 				</>
 			)}

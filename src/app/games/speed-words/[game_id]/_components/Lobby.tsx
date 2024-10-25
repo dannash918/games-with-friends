@@ -23,7 +23,6 @@ export default function Lobby({
 
 	players.sort((a, b) => b.score - a.score);
 	const winner = players.find((player) => player.score > -1);
-	console.log("Winner is: " + winner);
 
 	return (
 		<>
@@ -48,7 +47,9 @@ export default function Lobby({
 				{players.map((player: any, idx: number) => (
 					<div className={`row flex items-center justify-center `} key={idx}>
 						<div className={getTextColor(player.color)}>{player.name}</div>
-						{player.score > -1 && <div>: {player.score}</div>}
+						{player.score > -1 && (
+							<div className={getTextColor(player.color)}>: {player.score}</div>
+						)}
 					</div>
 				))}
 			</div>

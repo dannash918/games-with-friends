@@ -15,6 +15,7 @@ import {
 } from "../[game_id]/_components/letterFunctions";
 
 export interface Player {
+	active: boolean;
 	color: string;
 	connectionId: string;
 	name: string;
@@ -23,10 +24,11 @@ export interface Player {
 
 export default class SpeedWordsServer implements Party.Server {
 	constructor(readonly room: Party.Room) {}
-	gameExists: boolean = false;
+	roomExists: boolean = false;
 	token: string = "";
 	letterPool: string[] = [];
 	letterGrid: any = {};
+	gameInProgress: boolean = false;
 	colors: string[] = [
 		"red",
 		"orange",
@@ -57,18 +59,18 @@ export default class SpeedWordsServer implements Party.Server {
 			const message: any = await req.json();
 			console.log("Got to OnRequest. Message: " + JSON.stringify(message));
 
-			if (this.gameExists) {
+			if (this.roomExists) {
 				console.log(
 					`Game of Speed Words exists, returning game! There are ${this.players.length} players`,
 				);
 			} else {
-				this.gameExists = true;
+				this.roomExists = true;
 				console.log(
 					`Game of Speed Words does not exist, creating game! There are ${this.players.length} players`,
 				);
 			}
 		}
-		if (this.gameExists) {
+		if (this.roomExists) {
 			return new Response("You got the party kit server!", {
 				status: 200,
 			});
@@ -85,18 +87,16 @@ export default class SpeedWordsServer implements Party.Server {
 			name: queryParams.name || `Player ${this.players.length + 1}`,
 			color: getColor(this.colors),
 			score: -1,
+			active: false,
 		});
-		const simpPlayers = this.players.map((player) => ({
-			name: player.name,
-			color: player.color,
-		}));
 		const response = {
-			message: "playerList",
+			message: "joined",
 			data: {
-				players: simpPlayers,
+				players: this.players,
+				gameInProgress: this.gameInProgress,
+				letterGrid: this.letterGrid,
 			},
 		};
-		console.log("Player list is: " + JSON.stringify(response));
 		this.room.broadcast(JSON.stringify(response));
 	}
 
@@ -129,19 +129,17 @@ export default class SpeedWordsServer implements Party.Server {
 		this.players = this.players.filter(
 			(player) => player.connectionId !== connection.id,
 		);
-
-		const simpPlayers = this.players.map((player) => ({
-			name: player.name,
-			color: player.color,
-		}));
 		const response = {
-			message: "playerList",
+			message: "disconnected",
 			data: {
-				players: simpPlayers,
+				players: this.players,
 			},
 		};
 		console.log("Player list is: " + JSON.stringify(response));
 		this.room.broadcast(JSON.stringify(response));
+		if (this.players.length === 0) {
+			this.gameInProgress = false;
+		}
 	}
 
 	extractQueryParams(urlString: string): {
@@ -163,6 +161,7 @@ export default class SpeedWordsServer implements Party.Server {
 		const initLetter = getLetters(1, this.letterPool);
 		this.letterGrid = initLetterGrid(initLetter[0]);
 		for (const player of this.players) {
+			player.active = true;
 			const newLetters = getLetters(7, this.letterPool);
 			const response = {
 				message: "startGame",
@@ -170,6 +169,7 @@ export default class SpeedWordsServer implements Party.Server {
 					letterGrid: this.letterGrid,
 					letters: newLetters,
 					color: player.color,
+					active: true,
 				},
 			};
 			const connections = Array.from(this.room.getConnections());
@@ -180,6 +180,7 @@ export default class SpeedWordsServer implements Party.Server {
 			connection && connection.send(JSON.stringify(response));
 		}
 		this.broadcastLettersLeft();
+		this.gameInProgress = true;
 	}
 
 	playLetter(data: any) {
@@ -207,16 +208,17 @@ export default class SpeedWordsServer implements Party.Server {
 		console.log("Sending letter back: " + letterFromGrid);
 		if (letterFromGrid && letterFromGrid != "") {
 			for (const player of this.players) {
-				const response = {
-					message: "peel",
-					data: { letters: [letterFromGrid] },
-				};
-				console.log("Sending letter back: " + letterFromGrid + color);
 				if (player.color == color) {
 					const connections = Array.from(this.room.getConnections());
 					const connection = connections.find(
 						(connection) => connection.id === player.connectionId,
 					);
+
+					const response = {
+						message: "peel",
+						data: { letters: [letterFromGrid] },
+					};
+					console.log("Sending letter back: " + letterFromGrid + color);
 
 					connection && connection.send(JSON.stringify(response));
 				}
@@ -242,13 +244,20 @@ export default class SpeedWordsServer implements Party.Server {
 	}
 
 	peel() {
-		const connections: Iterable<Party.Connection<unknown>> =
-			this.room.getConnections();
-		const connectionsArray = Array.from(connections);
-		for (const connection of connectionsArray) {
+		for (const player of this.players.filter((player) => player.active)) {
+			const connections = Array.from(this.room.getConnections());
+			const connection = connections.find(
+				(connection) => connection.id === player.connectionId,
+			);
 			const newLetters = getLetters(2, this.letterPool);
+			console.log(
+				"Player: " +
+					player.color +
+					"New Letters: " +
+					JSON.stringify(newLetters),
+			);
 			const response = { message: "peel", data: { letters: newLetters } };
-			connection.send(JSON.stringify(response));
+			connection && connection.send(JSON.stringify(response));
 		}
 		this.broadcastLettersLeft();
 	}
@@ -309,6 +318,7 @@ export default class SpeedWordsServer implements Party.Server {
 		console.log("Players: " + JSON.stringify(this.players));
 		const response = { message: "finish", data: { players: this.players } };
 		this.room.broadcast(JSON.stringify(response));
+		this.gameInProgress = false;
 	}
 
 	broadcastLettersLeft() {
