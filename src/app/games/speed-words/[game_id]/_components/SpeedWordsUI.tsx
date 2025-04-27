@@ -9,9 +9,9 @@
 import usePartySocket from "partysocket/react";
 import { useEffect, useRef, useState } from "react";
 
+import Lobby from "@/app/games/_components/Lobby";
 import { PARTYKIT_HOST } from "@/lib/env";
 
-import Lobby from "./Lobby";
 import SpeedWordsBoard from "./SpeedWordsBoard";
 import { Keyboard } from "./SpeedWordsKeyboard";
 
