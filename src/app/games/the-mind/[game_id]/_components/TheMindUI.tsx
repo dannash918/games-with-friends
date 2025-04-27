@@ -191,7 +191,7 @@ export default function TheMindGame({ gameId }: { gameId: string }) {
 	return (
 		<div>
 			<div className="row flex justify-evenly">
-				{room && <div className="">Room: {room}</div>}
+				{room && <div className="">Room Is Awesome!: {room}</div>}
 				{totalCards && (
 					<div className="">
 						Cards Played: {playedCards} / {totalCards}
