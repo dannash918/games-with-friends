@@ -10,7 +10,8 @@ import {
 const games = [
 	{
 		label: "Bananagrams",
-		description: "Play your tiles to make words as fast as you can!",
+		description:
+			"Play your tiles to make words as fast as you can in this classic word game!",
 		href: "/games/speed-words",
 	},
 	{
