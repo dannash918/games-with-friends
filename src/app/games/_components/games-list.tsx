@@ -21,8 +21,9 @@ const games = [
 		href: "/games/the-mind",
 	},
 	{
-		label: "Spotify Quiz",
-		description: "Test your music knowledge with this awesome Spotify Quiz!",
+		label: "Music Quiz",
+		description:
+			"Test your music knowledge with this awesome Music Quiz integrated with Spotify!",
 		href: "/games/music-quiz",
 	},
 	{
