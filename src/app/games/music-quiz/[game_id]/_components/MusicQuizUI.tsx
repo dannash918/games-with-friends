@@ -10,6 +10,8 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PARTYKIT_HOST } from "@/lib/env";
 
+import QuizQuestion from "./QuizQuestion";
+
 export default function MusicQuizUI({ gameId }: { gameId: string }) {
 	const room = gameId;
 	const [callbackUri, setCallbackUri] = useState<string | undefined>(undefined);
@@ -18,9 +20,9 @@ export default function MusicQuizUI({ gameId }: { gameId: string }) {
 	const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
 	const RESPONSE_TYPE = "token";
 	const scope =
-		"streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state user-library-read user-library-modify";
+		"streaming user-read-email user-read-private user-read-playback-state user-top-read user-modify-playback-state user-library-read user-library-modify";
 
-	const [showSong, setShowSong] = useState<boolean>(false);
+	const [quizStart, setQuizStart] = useState<boolean>(false);
 	const [token, setToken] = useState<string | undefined>(undefined);
 
 	const socket = usePartySocket({
@@ -33,6 +35,13 @@ export default function MusicQuizUI({ gameId }: { gameId: string }) {
 		const mess = JSON.parse(response.data);
 		if (mess.message === "startGame") {
 			console.log("Starting the game!");
+		}
+		if (mess.message === "getTopArtists") {
+			console.log("Got Top Artists back! : " + JSON.stringify(mess.data));
+			if (mess.data.success === true) {
+				console.log("Successful mission!");
+				startQuiz();
+			}
 		}
 	};
 
@@ -48,11 +57,8 @@ export default function MusicQuizUI({ gameId }: { gameId: string }) {
 		console.log(REDIRECT_URI);
 	}, []);
 
-	const getSong = () => {
-		socket.send(
-			JSON.stringify({ message: "getSongs", data: { token: token } }),
-		);
-		setShowSong(!showSong);
+	const startQuiz = () => {
+		setQuizStart(!quizStart);
 	};
 
 	localStorage.setItem("room", room);
@@ -62,19 +68,23 @@ export default function MusicQuizUI({ gameId }: { gameId: string }) {
 
 	return (
 		<div>
-			<div>Welcome to the Music Quiz game!</div>
-			{!token && (
-				<a
-					href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${callbackUri}&response_type=${RESPONSE_TYPE}&scope=${scope}`}
-				>
-					<Button>Login to Spotify</Button>
-				</a>
+			{!quizStart && (
+				<div>
+					<div>Welcome to the Music Quiz game!</div>
+					{!token && (
+						<a
+							href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${callbackUri}&response_type=${RESPONSE_TYPE}&scope=${scope}`}
+						>
+							<Button>Login to Spotify</Button>
+						</a>
+					)}
+					{token && <div>Successfully logged in</div>}
+					<br />
+					{token && <Button onClick={startQuiz}>Start Quiz</Button>}
+				</div>
 			)}
-			{token && <div>Successfully logged in</div>}
-			<br />
-			<Button onClick={getSong}>Get Song!</Button>
-			{showSong && token && (
-				<div>coming soon...</div>
+			{quizStart && (
+				<QuizQuestion socket={socket} token={token} />
 				// <SpotifyPlayer
 				// 	token={token}
 				// 	uris={["spotify:artist:3zxKH0qp3nBCuPZCZT5Vaf"]}
