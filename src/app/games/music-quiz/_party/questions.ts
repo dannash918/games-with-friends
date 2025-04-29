@@ -11,9 +11,9 @@ import { GenerativeModel } from "@google/generative-ai";
 import { AnswerOption, QuestionWithAnswer } from "./musicquiz";
 
 export const questionFunctions = {
-	//getTopArtists,
+	getTopArtists,
 	getAlbumArtwork,
-	//getSongsFromGemini,
+	getSongsFromGemini,
 };
 
 export async function getTopArtists(
