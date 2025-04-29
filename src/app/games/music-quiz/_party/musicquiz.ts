@@ -20,6 +20,7 @@ const model = genAI.getGenerativeModel({
 
 export interface QuestionWithAnswer {
 	answers: AnswerOption[];
+	pictureUrl: string | null;
 	question: string;
 }
 

@@ -9,6 +9,7 @@ const nextConfig = {
 				pathname: "/**",
 			},
 		],
+		domains: ["i.scdn.co"], // Add Spotify's image domain
 	},
 };
 

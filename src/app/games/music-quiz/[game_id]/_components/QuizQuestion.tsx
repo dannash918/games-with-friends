@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import Image from "next/image";
 import PartySocket from "partysocket";
 import { useState } from "react";
 
@@ -49,6 +50,19 @@ export default function QuizQuestion({ socket, token }: QuizQuestionProps) {
 					<h2 className="mb-4 text-xl font-bold text-gray-800">
 						{questionData.question}
 					</h2>
+					{questionData.pictureUrl && (
+						<div className="relative h-16 w-64 overflow-hidden">
+							{" "}
+							{/* Adjust w-32 and h-8 as needed */}
+							<Image
+								src={questionData.pictureUrl}
+								alt="Album Artwork (Top Quarter)"
+								layout="fill"
+								objectFit="cover"
+								objectPosition="top"
+							/>
+						</div>
+					)}
 					<div className="answers grid grid-cols-1 gap-4">
 						{questionData.answers.map((answer, index) => (
 							<button

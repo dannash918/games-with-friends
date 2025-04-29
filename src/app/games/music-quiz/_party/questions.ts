@@ -11,16 +11,16 @@ import { GenerativeModel } from "@google/generative-ai";
 import { AnswerOption, QuestionWithAnswer } from "./musicquiz";
 
 export const questionFunctions = {
-	getTopArtists,
-	basicQuestion,
-	getSongsFromGemini,
+	//getTopArtists,
+	getAlbumArtwork,
+	//getSongsFromGemini,
 };
 
 export async function getTopArtists(
 	token: string,
 	model: GenerativeModel,
 ): Promise<QuestionWithAnswer | null> {
-	const data = await getTopArtistsSpotify(token);
+	const data = await getTopArtistsSpotify(token, 6);
 	if (data) {
 		const answers: AnswerOption[] = [];
 		const top6ArtistAnswer = { answer: data.items[5].name, isCorrect: true };
@@ -41,7 +41,7 @@ export async function getSongsFromGemini(
 	token: string,
 	model: GenerativeModel,
 ) {
-	const topArtists = await getTopArtistsSpotify(token);
+	const topArtists = await getTopArtistsSpotify(token, 15);
 	const randomArtistIndex = Math.floor(Math.random() * topArtists.items.length);
 	const randomArtist = topArtists.items[randomArtistIndex].name;
 
@@ -63,7 +63,7 @@ export async function getSongsFromGemini(
 			answers.push({ answer: answer.song, isCorrect: !answer.isCorrect });
 		}
 		return {
-			question: `Which song is not by the all time great band ${randomArtist}?`,
+			question: `Which song is not by the band ${randomArtist}?`,
 			answers: answers.sort(() => Math.random() - 0.5),
 		};
 	} catch (error) {
@@ -71,23 +71,57 @@ export async function getSongsFromGemini(
 	}
 }
 
-export async function basicQuestion(
+export async function getAlbumArtwork(
 	token: string,
 	model: GenerativeModel,
-): Promise<QuestionWithAnswer> {
+): Promise<QuestionWithAnswer | null> {
+	const topArtists = await getTopArtistsSpotify(token, 15);
+	const randomArtistIndex = Math.floor(Math.random() * topArtists.items.length);
+	const randomArtistId = topArtists.items[randomArtistIndex].id;
+
+	const headers = {
+		Authorization: `Bearer ${token}`,
+		"Content-Type": "application/json",
+	};
+
+	// Step 2: Get the artist's albums
+	const albumsEndpoint = `https://api.spotify.com/v1/artists/${randomArtistId}/albums?limit=4`;
+	const albumsResponse = await fetch(albumsEndpoint, { headers });
+	if (!albumsResponse.ok) {
+		throw new Error(`Spotify API error: ${albumsResponse.statusText}`);
+	}
+	const albumsData = await albumsResponse.json();
+	const albums = albumsData.items;
+	console.log(albums);
+
+	if (albums.length === 0) {
+		console.error("No albums found for this artist");
+		return null;
+	}
+
+	const answers = [];
+	const correctAlbum = albums[Math.floor(Math.random() * albums.length)];
+	for (const album of albums) {
+		if (album.id !== correctAlbum.id) {
+			answers.push({ answer: album.name, isCorrect: false });
+		} else {
+			answers.push({ answer: album.name, isCorrect: true });
+		}
+	}
+	console.log(correctAlbum.images[0].url);
 	return {
-		question: "What is the name of this song?",
-		answers: [
-			{ answer: "Song A", isCorrect: false },
-			{ answer: "Song B", isCorrect: true },
-			{ answer: "Song C", isCorrect: false },
-		],
+		question: "What is the name of this album?",
+		answers: answers.sort(() => Math.random() - 0.5),
+		pictureUrl: correctAlbum.images[0].url,
 	};
 }
 
-async function getTopArtistsSpotify(token: string): Promise<any> {
-	const endpoint =
-		"https://api.spotify.com/v1/me/top/artists?limit=6&time_range=medium_term";
+async function getTopArtistsSpotify(
+	token: string,
+	limit: number,
+): Promise<any> {
+	console.log("Getting top artists!");
+	const endpoint = `https://api.spotify.com/v1/me/top/artists?limit=${limit}&time_range=medium_term`;
 	const headers = {
 		Authorization: `Bearer ${token}`,
 		"Content-Type": "application/json",
@@ -102,6 +136,7 @@ async function getTopArtistsSpotify(token: string): Promise<any> {
 		console.log("User's Top Artists:", data.items);
 		return data;
 	} catch (error) {
+		console.error("Error fetching top artists:", error);
 		const topArtists = [
 			"Taylor Swift",
 			"Drake",
