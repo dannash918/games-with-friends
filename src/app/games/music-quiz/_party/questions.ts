@@ -12,10 +12,10 @@ import { GenerativeModel } from "@google/generative-ai";
 import { AnswerOption, QuestionWithAnswer } from "./musicquiz";
 
 export const questionFunctions = {
-	//getTopArtistsQuestion,
-	//getAlbumArtworkQuestion,
-	//getSongsFromGeminiQuestion,
-	//getAlbumDateQuestion,
+	getTopArtistsQuestion,
+	getAlbumArtworkQuestion,
+	getSongsFromGeminiQuestion,
+	getAlbumDateQuestion,
 	getTopTracksQuestion,
 };
 
