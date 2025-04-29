@@ -67,15 +67,18 @@ export default function QuizQuestion({ socket, token }: QuizQuestionProps) {
 					<h2 className="mb-4 text-center text-xl font-bold text-gray-800">
 						{questionData.question}
 					</h2>
-					{questionData.pictureUrl && (
-						<div className="relative mx-auto mb-4 flex h-24 w-64 overflow-hidden">
+					{questionData.picture && (
+						<div className="relative mx-auto mb-4 flex h-64 w-64 overflow-hidden">
 							<Image
-								src={questionData.pictureUrl}
+								src={questionData.picture.url}
 								alt="Album Artwork (Top Quarter)"
 								layout="fill"
 								objectFit="cover"
 								objectPosition="top"
 							/>
+							{questionData.picture.covered && (
+								<div className="absolute inset-x-0 bottom-0 h-2/3 bg-black" />
+							)}
 						</div>
 					)}
 					<div className="answers flex flex-col items-center gap-4">

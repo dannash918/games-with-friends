@@ -19,13 +19,18 @@ const model = genAI.getGenerativeModel({
 
 export interface QuestionWithAnswer {
 	answers: AnswerOption[];
-	pictureUrl?: string | null;
+	picture?: PictureAnswer;
 	question: string;
 }
 
 export interface AnswerOption {
 	answer: string;
 	isCorrect: boolean;
+}
+
+export interface PictureAnswer {
+	covered: boolean;
+	url: string;
 }
 
 export default class MusicQuizServer implements Party.Server {
