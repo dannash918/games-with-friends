@@ -5,6 +5,7 @@ import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+import { generateUUID } from "../functions/device-functions";
 import { createExtremeWordsGame } from "../games/extreme-words/_actions/create-extremewords-game";
 import { createMusicQuizGame } from "../games/music-quiz/_actions/create-musicquiz-game";
 import { createSpeedWordsGame } from "../games/speed-words/_actions/create-speedwords-game";
@@ -27,8 +28,10 @@ export default function CreateGameRoomForm({ game }: { game: string }) {
 	async function CreateGame(formData: FormData) {
 		const name = formData.get("name") as string;
 		const room = formData.get("room") as string;
-
+		const deviceId = localStorage.getItem("deviceId") || generateUUID();
+		localStorage.setItem("deviceId", deviceId);
 		localStorage.setItem("userName", name);
+
 		if (game === "the-mind") {
 			await createTheMindGame(room);
 		} else if (game === "extreme-words") {

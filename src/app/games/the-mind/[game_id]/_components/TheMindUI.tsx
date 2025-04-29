@@ -10,6 +10,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
+import { generateUUID } from "@/app/functions/device-functions";
 import InfoButton from "@/app/games/_components/info-button";
 import { Button } from "@/components/ui/button";
 import Select from "@/components/ui/Select";
@@ -66,6 +67,7 @@ async function fetchAndProcessGif(
 export default function TheMindGame({ gameId }: { gameId: string }) {
 	const room = gameId;
 	const playerName = localStorage.getItem("userName") || "Fred";
+	const deviceId = localStorage.getItem("deviceId") || generateUUID();
 	const cardOptions = ["1", "2", "3", "4", "5", "6", "7"];
 	const initialized = useRef(false);
 	const [numbers, setNumbers] = useState<string[]>([]);
@@ -78,6 +80,7 @@ export default function TheMindGame({ gameId }: { gameId: string }) {
 	const [gif, setGif] = useState<any>();
 	const scrollEndRef = useRef<null | HTMLDivElement>(null);
 	const [gameOver, setGameOver] = useState<boolean>(false);
+	console.log("Device ID: " + deviceId);
 
 	useEffect(() => {
 		if (gameOver) {
@@ -112,11 +115,11 @@ export default function TheMindGame({ gameId }: { gameId: string }) {
 			initialized.current = true;
 			console.log("Starting up");
 			const ws2 = new WebSocket(
-				`wss://kke8tbr1y5.execute-api.ap-southeast-2.amazonaws.com/test?room=${room}`,
+				`wss://kke8tbr1y5.execute-api.ap-southeast-2.amazonaws.com/test?room=${room}&name=${playerName}&deviceId=${deviceId}`,
 			);
 			setWs(ws2);
 		}
-	}, [room]);
+	}, [room, playerName]);
 
 	useEffect(() => {
 		console.log("Scrolling");
@@ -136,6 +139,11 @@ export default function TheMindGame({ gameId }: { gameId: string }) {
 		console.log(`Attempting to deal: ${numCards} cards`);
 		const jsonData = { action: "deal", room: room, numCards: cardsToDeal };
 		ws.send(JSON.stringify(jsonData));
+		const playCardWarmUp = {
+			action: "playCard",
+			warmUp: true,
+		};
+		ws.send(JSON.stringify(playCardWarmUp));
 	};
 
 	const handleKeyPress = (number: string) => {
