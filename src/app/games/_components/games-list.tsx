@@ -23,7 +23,7 @@ const games = [
 	{
 		label: "Spotify Quiz",
 		description: "Test your music knowledge with this awesome Spotify Quiz!",
-		href: "/games/music-quizs",
+		href: "/games/music-quiz",
 	},
 	{
 		label: "Extreme Articulate",
