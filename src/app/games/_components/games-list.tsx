@@ -21,6 +21,11 @@ const games = [
 		href: "/games/the-mind",
 	},
 	{
+		label: "Spotify Quiz",
+		description: "Test your music knowledge with this awesome Spotify Quiz!",
+		href: "/games/music-quizs",
+	},
+	{
 		label: "Extreme Articulate",
 		description:
 			"Play Articulate with a bunch of additional rules for extra chaos!!",
