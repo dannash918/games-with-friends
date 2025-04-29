@@ -17,6 +17,8 @@ export const questionFunctions = {
 	getSongsFromGeminiQuestion,
 	getAlbumDateQuestion,
 	getTopTracksQuestion,
+	getCompareArtistsQuestion,
+	getfavouriteSongQuestion,
 };
 
 export async function getTopArtistsQuestion(
@@ -34,6 +36,98 @@ export async function getTopArtistsQuestion(
 		return {
 			question:
 				"Which Artist is NOT in your Top 5 Most Listened to of the last 6 months?",
+			answers: answers.sort(() => Math.random() - 0.5),
+		};
+	}
+	return null;
+}
+
+export async function getfavouriteSongQuestion(
+	token: string,
+): Promise<QuestionWithAnswer | null> {
+	const data = await getTopTracksSpotify(token, 31);
+	if (data) {
+		const num1 = Math.floor(Math.random() * 27);
+		const num2 = Math.floor(Math.random() * (28 - num1)) + num1 + 1;
+		const num3 = Math.floor(Math.random() * (29 - num2)) + num2 + 1;
+		const num4 = Math.floor(Math.random() * (29 - num3)) + num3 + 1;
+
+		const song1 = data.items[num1];
+		const song2 = data.items[num2];
+		const song3 = data.items[num3];
+		const song4 = data.items[num4];
+
+		const answers: AnswerOption[] = [
+			{
+				answer: song1.name,
+				isCorrect: true,
+			},
+			{
+				answer: song2.name,
+				isCorrect: false,
+			},
+			{
+				answer: song3.name,
+				isCorrect: false,
+			},
+			{
+				answer: song4.name,
+				isCorrect: false,
+			},
+		];
+
+		return {
+			question: "Which of these songs was your highest played?",
+			answers: answers.sort(() => Math.random() - 0.5),
+		};
+	}
+	return null;
+}
+
+export async function getCompareArtistsQuestion(
+	token: string,
+): Promise<QuestionWithAnswer | null> {
+	const data = await getTopArtistsSpotify(token, 30);
+	if (data) {
+		// Limit num1 to the range 0 to 8
+		const num1 = Math.floor(Math.random() * 17);
+		console.log("Num1: " + num1);
+		// Generate num2, ensuring it's greater than num1 and within 0 to 9
+		const num2 = Math.floor(Math.random() * (18 - num1)) + num1 + 1;
+		console.log("Num2: " + num2);
+		// Generate num2, ensuring it's greater than num2 and within 0 to 9
+		const num3 = Math.floor(Math.random() * (19 - num2)) + num2 + 1;
+		console.log("Num3: " + num3);
+		// Generate num2, ensuring it's greater than num2 and within 0 to 9
+		const num4 = Math.floor(Math.random() * (19 - num3)) + num3 + 1;
+		console.log("Num3: " + num4);
+
+		const artist1 = data.items[num1];
+		const artist2 = data.items[num2];
+		const artist3 = data.items[num3];
+		const artist4 = data.items[num4];
+
+		const answers: AnswerOption[] = [
+			{
+				answer: artist1.name,
+				isCorrect: true,
+			},
+			{
+				answer: artist2.name,
+				isCorrect: false,
+			},
+			{
+				answer: artist3.name,
+				isCorrect: false,
+			},
+			{
+				answer: artist4.name,
+				isCorrect: false,
+			},
+		];
+
+		return {
+			question: "Which artist did you listen to the most in the last 6 months?",
 			answers: answers.sort(() => Math.random() - 0.5),
 		};
 	}
