@@ -119,7 +119,7 @@ export default function TheMindGame({ gameId }: { gameId: string }) {
 			);
 			setWs(ws2);
 		}
-	}, [room, playerName]);
+	}, [room, playerName, deviceId]);
 
 	useEffect(() => {
 		console.log("Scrolling");

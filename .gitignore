@@ -38,3 +38,5 @@ next-env.d.ts
 .partykit
 .env
 /testrun.mjs
+
+.vercel
