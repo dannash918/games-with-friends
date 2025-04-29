@@ -77,7 +77,7 @@ export async function getAlbumArtwork(
 ): Promise<QuestionWithAnswer | null> {
 	const topArtists = await getTopArtistsSpotify(token, 15);
 	const randomArtistIndex = Math.floor(Math.random() * topArtists.items.length);
-	const randomArtistId = topArtists.items[randomArtistIndex].id;
+	const randomArtist = topArtists.items[randomArtistIndex];
 
 	const headers = {
 		Authorization: `Bearer ${token}`,
@@ -85,7 +85,7 @@ export async function getAlbumArtwork(
 	};
 
 	// Step 2: Get the artist's albums
-	const albumsEndpoint = `https://api.spotify.com/v1/artists/${randomArtistId}/albums?limit=4`;
+	const albumsEndpoint = `https://api.spotify.com/v1/artists/${randomArtist.id}/albums?limit=4`;
 	const albumsResponse = await fetch(albumsEndpoint, { headers });
 	if (!albumsResponse.ok) {
 		throw new Error(`Spotify API error: ${albumsResponse.statusText}`);
@@ -110,7 +110,7 @@ export async function getAlbumArtwork(
 	}
 	console.log(correctAlbum.images[0].url);
 	return {
-		question: "What is the name of this album?",
+		question: `What is the name of this album from the band ${randomArtist.name}?`,
 		answers: answers.sort(() => Math.random() - 0.5),
 		pictureUrl: correctAlbum.images[0].url,
 	};
