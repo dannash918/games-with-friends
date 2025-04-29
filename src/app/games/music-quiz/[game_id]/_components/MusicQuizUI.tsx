@@ -44,6 +44,7 @@ export default function MusicQuizUI({ gameId }: { gameId: string }) {
 			}
 		}
 	};
+	console.log("URL is: " + PARTYKIT_HOST);
 
 	useEffect(() => {
 		const token = localStorage.getItem("token") || undefined;
